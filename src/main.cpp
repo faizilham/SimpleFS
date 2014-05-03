@@ -1,7 +1,7 @@
 #include <iostream>
 #include "fuse_impl.hpp"
 
-static struct fuse_operations simple_op;
+struct fuse_operations simple_op;
 SimpleFS filesystem;
 
 /* inisialisasi mapping fungsi-fungsi fuse */

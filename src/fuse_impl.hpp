@@ -1,5 +1,5 @@
 #ifndef FUSE_IMPL_HPP
-#define FUSE_IMPL_
+#define FUSE_IMPL_HPP
 
 /** Header implementasi fungsi-fungsi fuse */
 
