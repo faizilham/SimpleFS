@@ -23,9 +23,6 @@ OBJS := ${MODULES:%.cpp=bin/%.o}
   
 all: $(OBJS)
 	g++ -o bin/main $(OBJS) $(LIB)
-
-run:
-	./bin/main
 	
 clean:
 	rm -f bin/main bin/*.o
