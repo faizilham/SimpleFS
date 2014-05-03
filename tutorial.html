@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>Tutorial Singkat FUSE</title>
+<style>
+body{
+	font-family: sans-serif;
+}
+#filedesc{
+	width: 25%;
+	text-align:center;
+}
+
+#hdesc{
+	width: 50%;
+	text-align:center;
+}
+
+#slotdesc{
+	width: 50%;
+	text-align:center;
+}
+</style>
+</head>
+<body>
+	<h2>Tutorial Singkat FUSE</h2>
+	by Asisten Sister (c) 2014
+	<hr/>
+	
+	<p>
+		Pada tutorial ini akan dijelaskan pengantar singkat implementasi sebuah filesystem sederhana dengan FUSE. Filesystem sederhana ini akan kita sebut dengan nama SimpleFS. SimpleFS, karena sangat sederhana, memiliki batasan dan karakteristik sebagai berikut:
+		<ol>
+			<li>Tidak ada direktori, kecuali root directory</li>
+			<li>Maksimum hanya mampu menampung 255 file</li>
+			<li>Satu file maksimal memiliki ukuran 100 byte</li>
+			<li>Permission setiap file pasti rwxrwxrwx</li>
+			<li>Waktu pembuatan file tidak disimpan, dan selalu diisi dengan waktu mounting filesystem</li>
+		</ol>
+	</p>
+	<h3>Metode penyimpanan</h3>
+	<p>
+		Seluruh file pada SimpleFS sebenarnya disimpan pada sebuah file, kita sebut file ini dengan nama simple.fs. File simple.fs terdiri dari sebuah header berukuran 8 byte, dan 255 buah slot berukuran 128 byte. Slot ini digunakan untuk menyimpan setiap file.
+	</p>
+	<center>
+		<table id="filedesc" border=1>
+		<tr><td>Header<br/>8 byte</td></tr>
+		<tr><td>Slots<br/>255 x 128 byte</td></tr>
+		</table>
+	</center>
+	<p>
+		Header terdiri dari 6 byte magic string "SIMPLE", 1 byte berisi jumlah available slot dan 1 byte berisi firstEmpty, indeks slot pertama yang masih kosong.
+	</p>
+	<center>
+		<table id="hdesc" border=1>
+		<tr><td>Offset<br/>(posisi awal data)</td><td>Ukuran</td><td>Deskripsi</td></tr>
+		<tr><td>0</td><td>6</td><td>Magic string "SIMPLE" untuk memudahkan validasi bahwa file yang digunakan adalah file simple.fs</td></tr>
+		<tr><td>6</td><td>1</td><td>Available, yaitu jumlah slot yang masih kosong, berupa unsigned char</td></tr>
+		<tr><td>7</td><td>1</td><td>FirstEmpty, yaitu indeks slot pertama yang masih kosong, berupa unsigned char</td></tr>
+		</table>
+	</center>
+	<p>
+		Sebuah slot terdiri dari 27 byte null-terminated string nama file, 1 byte ukuran file dan 100 byte data isi file.
+	</p>
+	<center>
+		<table id="slotdesc" border=1>
+		<tr><td>Offset<br/>(posisi awal data)</td><td>Ukuran</td><td>Deskripsi</td></tr>
+		<tr><td>0</td><td>27</td><td>Nama file, berupa null-terminated string. Jika nama file kosong, maka slot dianggap kosong / belum terpakai</td></tr>
+		<tr><td>27</td><td>1</td><td>Panjang file, berupa unsigned char</td></tr>
+		<tr><td>28</td><td>100</td><td>Isi file, berupa array of char</td></tr>
+		</table>
+	</center>
+	<h3>Implementasi</h3>
+	<p>
+		Implementasi SimpleFS terdapat pada direktori src, dengan:
+		<ul>
+		<li><b>main.cpp</b><br/>
+			Main program, berisi inisialisasi objek-objek, mapping fungsi dan parameter fuse</li>
+		<li><b>simplefs.hpp</b> dan <b>simplefs.cpp</b><br/>
+			Berisi deklarasi dan implementasi kelas Slot dan SimpleFS. Slot adalah kelas model untuk slot, dan SimpleFS adalah kelas model untuk file simple.fs</li>
+		<li><b>fuse_impl.hpp</b> dan <b>fuse_impl.cpp</b><br/>
+			Berisi deklarasi dan implementasi fungsi-fungsi FUSE</li>
+		</ul>
+		
+		Penjelasan lebih lengkap mengenai implementasi dapat dibaca langsung pada source code tersebut.
+	</p>
+	<h3>Pemakaian</h3>
+	<p>
+		<ul>
+			<li><pre>make all</pre>
+				kompilasi program</li>
+			<li><pre>bin/main test_dir test_file</pre>
+				untuk melakukan mounting file test_file pada direktori test_dir</li>
+			<li><pre>bin/main test_dir test_file --new</pre>
+				membuat file simple.fs baru bernama test_file, lalu melakukan mount file tersebut pada direktori test_dir</li>
+			
+		</ul>
+	</p>
+</body>
+</html>
