@@ -22,10 +22,10 @@ using namespace std;
 int main(int argc, char** argv){
 	
 	// jika terdapat argumen --new, buat baru
-	if (argc > 2 && string(argv[2]) == "--new")
-		filesystem.create("test.fs");
+	if (argc > 3 && string(argv[3]) == "--new")
+		filesystem.create(argv[2]);
 	else
-		filesystem.load("test.fs");
+		filesystem.load(argv[2]);
 		
 	
 	// inisialisasi fuse
